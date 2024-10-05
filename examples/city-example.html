@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" integrity="sha256-+bdWuWOXMFkX0v9Cvr3OWClPiYefDQz9GGZP/7xZxdc=" crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"  integrity="sha256-LWhzWaQGZRsWFrrJxg+6Zn8TT84k0/trtiHBc6qcGpY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js" integrity="sha256-WL6HHfYfbFEkZOFdsJQeY7lJG/E5airjvqbznghUzRw=" crossorigin=""></script>
+<script src="../src/leaflet.directionmarker.js"></script>
+<script src="city-data.js"></script>
+<style type="text/css">
+body { font-family: Verdana, Arial, Helvetica, sans-serif; }
+#container { height: 80vh; display: flex; flex-direction: row; }
+#capitals, #germanCities { border: 1px solid black; padding: 1em; margin: 2px; background-color: #f8f8f8; width: 300px; overflow-y: auto; }
+h2 {margin-top: 0; }
+table {border: 2px solid black; border-collapse: collapse; width: 100%}
+tr:hover, tr.pin-hover { background-color: yellow; }
+tr, th { border: 1px solid #888; }
+th { border-bottom: 2px solid black; }
+#map { flex-grow: 1; }
+.leaflet-direction-pane { z-index: 620; pointer-events: none; }
+.marker-cluster-green div { background-color: #20A839;}
+.marker-cluster-blue div { background-color: #267FCA;}
+</style>
+<script type="text/javascript">
+
+var map = undefined;
+var directionMarker = undefined;
+
+function population(number) {
+	if (number > 10000000)
+		return Math.round(number / 1000000) / 1 + "M";
+	if (number > 1000000)
+		return Math.round(number / 100000) / 10 + "M";
+	if (number > 10000)
+		return Math.round(number / 1000) / 1 + "k";
+	if (number > 1000)
+		return Math.round(number / 100) / 10 + "k";
+	return number;
+}
+
+function hideDirectionMarker() {
+	if (directionMarker !== undefined) {
+		directionMarker.removeFrom(map);
+		directionMarker = undefined;
+	}
+}
+
+function createCluster(data, color, tableElement) {
+	let pinIcon = new L.Icon.MyIcon({iconUrl: 'city-' + color + '-marker-icon.png'});
+	let cluster = L.markerClusterGroup({
+		iconCreateFunction: function(cluster) {
+			return new L.DivIcon({ html: '<div><span>' + cluster.getChildCount() + '</span></div>', className: 'marker-cluster marker-cluster-' + color, iconSize: new L.Point(40, 40) });
+		}
+	});
+	for(let city of data) {
+		let marker = L.marker([city[2], city[3]], {alt: city[0], icon: pinIcon});
+		marker.bindTooltip(city[0]);
+		marker.bindPopup("<b>"+city[0]+"</b><br/>Population: "+population(city[1]));
+		cluster.addLayer(marker);
+		let trElement = document.createElement("tr");
+		trElement.innerHTML = '<tr><td>' + city[0]+'</td><td>' + population(city[1])+'</td></tr>';
+		marker.on('mouseover', function() {
+			trElement.classList.add("pin-hover");
+		});
+		marker.on('mouseout', function() {
+			trElement.classList.remove("pin-hover");
+		});
+		marker.on('click', function() {
+			trElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+		});
+		trElement.onmouseover = function() {
+			hideDirectionMarker();
+			directionMarker = L.marker.direction([city[2], city[3]], {alt: city[0]}).addTo(map);
+		};
+		trElement.onmouseout = function() {
+			hideDirectionMarker();
+		};
+		trElement.onclick = function() {
+			cluster.zoomToShowLayer(marker, function() {
+				marker.openPopup();
+			});
+		};
+		tableElement.appendChild(trElement);
+	}
+	return cluster;
+}
+
+window.onload = function() {
+	L.Marker.Direction.initialize('../src/');
+	L.Icon.MyIcon = L.Icon.extend({
+		options: {
+			shadowUrl: 'city-marker-shadow.png',
+			iconSize:     L.Icon.Default.prototype.options.iconSize,
+			shadowSize:   L.Icon.Default.prototype.options.shadowSize,
+			iconAnchor:   L.Icon.Default.prototype.options.iconAnchor,
+			shadowAnchor: L.Icon.Default.prototype.options.shadowAnchor,
+			popupAnchor:  L.Icon.Default.prototype.options.popupAnchor
+		}
+	});
+	map = L.map('map');
+	L.control.scale({imperial:false}).addTo(map);
+	L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	}).addTo(map);
+	let cityCluster = createCluster(cityData, 'green', document.getElementById("germanCities").lastElementChild).addTo(map);
+	createCluster(capitalData, 'blue', document.getElementById("capitals").lastElementChild).addTo(map);
+	map.fitBounds(cityCluster.getBounds());
+};
+
+</script>
+
+</head>
+<body>
+<h1>Cities Example</h1>
+<div id="container">
+	<div id="capitals">
+		<h2>Capitals</h2>
+		<table><tr><th>Name</th><th>Pop.</th></tr></table>
+	</div>
+	<div id="map"></div>
+	<div id="germanCities">
+		<h2>German cities</h2>
+		<table><tr><th>Name</th><th>Pop.</th></tr></table>
+	</div>
+</div>
+</body>
+</html>

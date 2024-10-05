@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Version 1.0.0 example</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0/dist/leaflet.css" integrity="sha256-PFO9CfQJUoeHCST/XnUtF/RaNuH/LgguGQ1ykt3iA7Y=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.0.0/dist/leaflet.js" integrity="sha256-QyV8n1wv7zgfy1V3Qxohfk1ENac72aWwRcYjUnjYGAc=" crossorigin=""></script>
+<script src="../src/leaflet.directionmarker.js"></script>
+<style type="text/css">
+body { font-family: Verdana, Arial, Helvetica, sans-serif; }
+#map { height: 70vh; }
+#legend { width: 300px; float: right; border: 1px solid black; background-color: #f8f8f8; padding: 1em; margin-left: 1em; }
+
+/* needed if you want to use the direction pane */
+.leaflet-direction-pane { z-index: 620; pointer-events: none; }
+
+</style>
+<script type="text/javascript">
+
+let dataPoints = {
+	Somosomo: [-16.7759, -179.9811],
+	Berlin: [52.5167, 13.3833],
+	Wellington: [-41.289, 174.777]
+};
+
+window.onload = function() {
+	L.Marker.Direction.initialize('../src/');
+	let map = L.map('map').fitWorld();
+	layerControl = L.control.layers({}, {Dummy: L.layerGroup([])}).addTo(map);
+	L.Marker.Direction.avoidControls(map, [ map.zoomControl, layerControl ]);
+	L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	}).addTo(map);
+	for(let key in dataPoints) {
+		L.marker(dataPoints[key], {alt: key}).addTo(map).bindPopup("<b>"+key+"</b>");
+		dataPoints[key].directionMarker = L.marker.direction(dataPoints[key], {alt: key});
+	}
+	let hovered = dataPoints.Berlin.directionMarker.addTo(map);
+	document.querySelector("#legend input")
+	for(let r of document.querySelectorAll("#legend input")) {
+		r.onclick = function() {
+			if (hovered) {
+				hovered.removeFrom(map);
+				hovered = null;
+			}
+			if (r.value != "") {
+				hovered = dataPoints[r.value].directionMarker.addTo(map);
+			}
+		};
+	}
+	L.control.scale({imperial:false}).addTo(map);
+};
+
+</script>
+</head>
+<body>
+	<h1>Version 1.0.0 Example</h1>
+	<div id="legend">
+		<p><label><input type="radio" name="citySelect" value="Berlin" checked> Berlin</label></p>
+		<p><label><input type="radio" name="citySelect" value="Somosomo"> Somosomo</label></p>
+		<p><label><input type="radio" name="citySelect" value="Wellington"> Wellington</label></p>
+		<p><label><input type="radio" name="citySelect" value=""> None</label></p>
+	</div>
+	<div id="map"></div>
+</body>
+</html>

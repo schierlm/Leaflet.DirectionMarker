@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Minimal example</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="../src/leaflet.directionmarker.js"></script>
+<style type="text/css">
+body { height: 100vh;  width: 100vw; margin: 0;}
+
+/* needed if you want to use the direction pane */
+.leaflet-direction-pane { z-index: 620; pointer-events: none; }
+
+</style>
+<script type="text/javascript">
+
+window.onload = function() {
+	L.Marker.Direction.initialize('../src/');
+	let map = L.map('map').setView([52.5167,13.3833], 6);
+	L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	}).addTo(map);
+
+	L.marker([52.5167,13.3833], {alt: "Berlin"}).addTo(map);
+	L.marker.direction([52.5167,13.3833], {alt: "Berlin"}).addTo(map);
+};
+
+</script>
+</head>
+<body id="map"></body>
+</html>
