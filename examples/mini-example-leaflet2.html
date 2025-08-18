@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Minimal example</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.css" integrity="sha256-P+hWJNlpL+GBSRYC7cdsDbQH91URmpDeOzLp7DbFRtE=" crossorigin=""/>
+<script type="importmap">
+  {
+    "imports": {
+        "leaflet": "https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.js",
+        "leaflet-directionmarker": "../src/leaflet2.directionmarker.js"
+    },
+    "integrity": {
+        "https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.js": "sha256-gj5JhNAaMi6LCs+jVFOk8sXDe1sWSS2Zlc87m+trLiQ="
+    }
+  }
+</script>
+<style type="text/css">
+body, #map { height: 100vh;  width: 100vw; margin: 0;}
+
+/* needed if you want to use the direction pane */
+.leaflet-direction-pane { z-index: 620; pointer-events: none; }
+
+</style>
+<script type="module">
+
+import {LeafletMap, TileLayer, Marker} from 'leaflet';
+import {DirectionMarker} from 'leaflet-directionmarker';
+
+window.onload = function() {
+	DirectionMarker.initialize('../src/');
+	let map = new LeafletMap('map').setView([52.5167,13.3833], 6);
+	new TileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	}).addTo(map);
+
+	new Marker([52.5167,13.3833], {alt: "Berlin"}).addTo(map);
+	new DirectionMarker([52.5167,13.3833], {alt: "Berlin"}).addTo(map);
+};
+
+</script>
+</head>
+<body><div id="map"></div></body>
+</html>

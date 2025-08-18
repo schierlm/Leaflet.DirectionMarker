@@ -73,6 +73,24 @@ API
 - `L.marker.direction` is the factory function to create direction markers, as per Leaflet convention.
 
 
+Leaflet v2 changes
+------------------
+
+- No need to add script tags. Add [`leaflet2.directionmarker.js`](./src/leaflet2.directionmarker.js) as
+  `leaflet-directionmarker` to your *importmap* instead.
+
+- `import {DirectionMarker} from 'leaflet-directionmarker';`
+
+- Instead of L.marker.direction, refer to the imported DirectionMarker, use it with *new* to create markers, call
+  `initialize` and `avoidControls` without *new*.
+
+- Examples use `-leaflet2` in their file names:
+  - [`city-example-leaflet2.html`](./examples/city-example-leaflet2.html) ([view in browser](https://schierlm.github.io/Leaflet.DirectionMarker/examples/city-example-leaflet2.html))
+    - Misses marker cluster support; will come later once [Leaflet.MarkerCluster](https://github.com/Leaflet/Leaflet.markercluster) has been updated.
+  - [`small-example-leaflet2.html`](./examples/small-example-leaflet2.html) ([view in browser](https://schierlm.github.io/Leaflet.DirectionMarker/examples/small-example-leaflet2.html))
+  - [`mini-example-leaflet2.html`](./examples/mini-example-leaflet2.html) ([view in browser](https://schierlm.github.io/Leaflet.DirectionMarker/examples/mini-example-leaflet2.html))
+
+
 License
 -------
 

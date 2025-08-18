@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Small example</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.css" integrity="sha256-P+hWJNlpL+GBSRYC7cdsDbQH91URmpDeOzLp7DbFRtE=" crossorigin=""/>
+<script type="importmap">
+  {
+    "imports": {
+        "leaflet": "https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.js",
+        "leaflet-directionmarker": "../src/leaflet2.directionmarker.js"
+    },
+    "integrity": {
+        "https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.js": "sha256-gj5JhNAaMi6LCs+jVFOk8sXDe1sWSS2Zlc87m+trLiQ="
+    }
+  }
+</script>
+<style type="text/css">
+body { font-family: Verdana, Arial, Helvetica, sans-serif; }
+#map { height: 70vh; }
+#legend { width: 300px; float: right; border: 1px solid black; background-color: #f8f8f8; padding: 1em; margin-left: 1em; }
+
+/* needed if you want to use the direction pane */
+.leaflet-direction-pane { z-index: 620; pointer-events: none; }
+
+</style>
+<script type="module">
+
+import {LeafletMap, TileLayer, Marker, Control, LayerGroup} from 'leaflet';
+import {DirectionMarker} from 'leaflet-directionmarker';
+
+let dataPoints = {
+	Somosomo: [-16.7759, -179.9811],
+	Berlin: [52.5167, 13.3833],
+	Wellington: [-41.289, 174.777]
+};
+
+window.onload = function() {
+	DirectionMarker.initialize('../src/');
+	let map = new LeafletMap('map').fitWorld();
+	let layerControl = new Control.Layers({}, {Dummy: new LayerGroup([])}).addTo(map);
+	new Control.Scale({imperial:false}).addTo(map);
+	DirectionMarker.avoidControls(map, [ map.zoomControl, layerControl ]);
+	new TileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	}).addTo(map);
+	for(let key in dataPoints) {
+		new Marker(dataPoints[key], {alt: key}).addTo(map).bindPopup("<b>"+key+"</b>");
+		dataPoints[key].directionMarker = new DirectionMarker(dataPoints[key], {alt: key});
+	}
+	let hovered = dataPoints.Berlin.directionMarker.addTo(map);
+	document.querySelector("#legend input")
+	for(let r of document.querySelectorAll("#legend input")) {
+		r.onclick = function() {
+			if (hovered) {
+				hovered.removeFrom(map);
+				hovered = null;
+			}
+			if (r.value != "") {
+				hovered = dataPoints[r.value].directionMarker.addTo(map);
+			}
+		};
+	}
+};
+
+</script>
+</head>
+<body>
+	<h1>Small Example</h1>
+	<div id="legend">
+		<p><label><input type="radio" name="citySelect" value="Berlin" checked> Berlin</label></p>
+		<p><label><input type="radio" name="citySelect" value="Somosomo"> Somosomo</label></p>
+		<p><label><input type="radio" name="citySelect" value="Wellington"> Wellington</label></p>
+		<p><label><input type="radio" name="citySelect" value=""> None</label></p>
+	</div>
+	<div id="map"></div>
+</body>
+</html>
