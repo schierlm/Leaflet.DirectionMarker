@@ -9,7 +9,7 @@
   {
     "imports": {
         "leaflet": "https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.js",
-		"leaflet-markercluster": "https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js",
+		"leaflet.markercluster": "https://unpkg.com/@kristjan.esperanto/leaflet.markercluster@3/dist/leaflet.markercluster.js",
         "leaflet-directionmarker": "../src/leaflet2.directionmarker.js"
     },
     "integrity": {
@@ -34,7 +34,8 @@ th { border-bottom: 2px solid black; }
 </style>
 <script type="module">
 
-import {LeafletMap, TileLayer, Marker, Icon, Control, LayerGroup, FeatureGroup} from 'leaflet';
+import {LeafletMap, TileLayer, Marker, Icon, Control, LayerGroup, FeatureGroup, DivIcon, Point} from 'leaflet';
+import { MarkerClusterGroup } from "leaflet.markercluster";
 import {DirectionMarker} from 'leaflet-directionmarker';
 
 class MyIcon extends Icon {
@@ -74,12 +75,11 @@ function hideDirectionMarker() {
 
 function createCluster(data, color, tableElement) {
 	let pinIcon = new MyIcon({iconUrl: 'city-' + color + '-marker-icon.png'});
-	//@let cluster = new MarkerClusterGroup({
-	//@	iconCreateFunction: function(cluster) {
-	//@		return new DivIcon({ html: '<div><span>' + cluster.getChildCount() + '</span></div>', className: 'marker-cluster marker-cluster-' + color, iconSize: new Point(40, 40) });
-	//@	}
-	//@});
-	let cluster = new FeatureGroup();
+	let cluster = new MarkerClusterGroup({
+		iconCreateFunction: function(cluster) {
+			return new DivIcon({ html: '<div><span>' + cluster.getChildCount() + '</span></div>', className: 'marker-cluster marker-cluster-' + color, iconSize: new Point(40, 40) });
+		}
+	});
 	for(let city of data) {
 		let marker = new Marker([city[2], city[3]], {alt: city[0], icon: pinIcon});
 		marker.bindTooltip(city[0]);

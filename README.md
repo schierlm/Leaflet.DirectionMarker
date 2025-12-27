@@ -86,7 +86,6 @@ Leaflet v2 changes
 
 - Examples use `-leaflet2` in their file names:
   - [`city-example-leaflet2.html`](./examples/city-example-leaflet2.html) ([view in browser](https://schierlm.github.io/Leaflet.DirectionMarker/examples/city-example-leaflet2.html))
-    - Misses marker cluster support; will come later once [Leaflet.MarkerCluster](https://github.com/Leaflet/Leaflet.markercluster) has been updated.
   - [`small-example-leaflet2.html`](./examples/small-example-leaflet2.html) ([view in browser](https://schierlm.github.io/Leaflet.DirectionMarker/examples/small-example-leaflet2.html))
   - [`mini-example-leaflet2.html`](./examples/mini-example-leaflet2.html) ([view in browser](https://schierlm.github.io/Leaflet.DirectionMarker/examples/mini-example-leaflet2.html))
 
