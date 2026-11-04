@@ -2,11 +2,9 @@ import {Marker, Util, Icon, LatLng} from 'leaflet';
 
 export class DirectionMarker extends Marker {
 
-	static {
-		this.setDefaultOptions({
-			pane: 'directionPane', keyboard: false, raiseOnHover: false
-		});
-	}
+	static defaultOptions = {
+		pane: 'directionPane', keyboard: false, raiseOnHover: false
+	};
 
 	onAdd(map) {
 			if (DirectionMarker._normalIcon === undefined) {
